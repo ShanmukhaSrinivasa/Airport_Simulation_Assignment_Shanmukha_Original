@@ -1,87 +1,43 @@
-# ✈️ Airport Simulation 3D
+✈️ Airport Simulation Assignment
+This project is a functional airport simulation built in Unity, featuring dynamic aircraft state management and a waypoint-based navigation system.
 
-**Objective:** Create a near-realistic 3D simulation focused on world creation, smooth movement, and UI interaction.
-**Scenario Chosen:** Option 2 - Airport Simulation
+🛠️ Chosen Option
+I selected Option 2: Airport Simulation. The goal was to create a realistic environment where multiple aircraft manage their own cycles of taxiing, takeoff, and landing while allowing the user to observe the operations from various perspectives.
 
----
+🎮 Controls
+The simulation uses a dual-camera system to give the user full control over the view:
 
-## 🎮 Controls & Interaction
+Free Camera:
 
-* **W/A/S/D**: Pan the camera freely around the airport and city.
-* **Right-Click + Mouse**: Rotate the camera view.
-* **Mouse Scroll**: Zoom in and out.
-* **Left-Click (On Aircraft)**:
-* Selects the aircraft and displays its **ID, Status, and Speed** in the UI.
-* Activates a **Visual Highlight (Cylinder)** at the base of the plane.
-* **Auto-Follow**: The camera will automatically transition to follow the selected aircraft in flight.
+WASD / Arrow Keys: Pan the camera around the airport.
 
+Right-Click + Drag: Rotate the view.
 
-* **UI Controls**:
-* **Start/Stop Simulation**: A master toggle to pause or resume the entire airport environment.
-* **Live Board**: A real-time Arrival/Departure board showing the status of all active flights.
+Mouse Scroll: Zoom in and out.
 
+Interaction & Follow Mode:
 
+Left-Click: Select any aircraft to view its unique ID and current flight state.
 
----
+Follow View: Once selected, the camera will automatically track that specific aircraft through its flight path.
 
-## 🚀 Key Features & Implementation
+Simulation Toggle: Use the UI button to start or stop the simulation logic.
 
-### 1. Realistic Movement & State Machine
+⚙️ Movement Logic
+The aircraft movement is handled by a custom state machine that transitions based on a waypoint system:
 
-The aircraft utilize a robust waypoint-based system. Each plane transitions through four logical states based on its progress along the path:
+Waypoint Navigation: Each aircraft follows a pre-defined path of 68 waypoints using Vector3.MoveTowards for smooth translation.
 
-* **Parking**: Stationary at the gate with a countdown timer before departure.
-* **Taxiing**: Low-speed movement on taxiways.
-* **Takeoff**: Rapid acceleration on the runway followed by a climb into the sky.
-* **Landing**: Approach from the city, touchdown, and deceleration.
-* **Smoothness**: All speed changes use `Mathf.MoveTowards` for natural acceleration, and rotations use `Quaternion.Slerp` for smooth turns.
+State Transitions: The logic checks the currentWaypointIndex to trigger specific behaviors:
 
-### 2. Animations & Visuals
+Taxiing: Ground movement at steady speeds.
 
-* **Propellers**: Real-time rotation synced to the simulation speed.
-* **Landing Gear**: Fully functional logic that retracts the gear after takeoff (height > 5 units) and extends it during the landing approach.
-* **Navigation Lights**: Red (Left) and Green (Right) wingtip point lights that activate automatically during flight phases.
+Takeoff: Acceleration initiated at the runway start, with the aircraft pitch increasing as it gains speed.
 
-### 3. Dynamic UI System
+Landing: Approach markers trigger the descent and landing gear deployment.
 
-* **Selection Manager**: Uses Raycasting to detect aircraft on a specific physics layer.
-* **Live Airport Board**: A centralized UI panel that loops through all aircraft data to provide a "Terminal View" of the simulation.
-* **Color-Coded Status**: Uses Rich Text (Hex codes) to highlight flight statuses (e.g., Green for Takeoff, Red for Parking).
+Parking: Automatic halt at designated gates with a timer for departure.
 
----
+Realistic Rotation: All turns use Quaternion.Slerp to ensure the aircraft bank naturally toward their next target rather than snapping instantly.
 
-## 🛠️ Technical Setup
-
-* **Engine**: Unity 3D
-* **Language**: C#
-* **UI System**: TextMeshPro (for high-fidelity text and rich-color support).
-* **Camera**: Dual-mode (Free Look and Smooth Follow) using `unscaledDeltaTime` to ensure the user can still navigate while the simulation is paused.
-
----
-
-## 📂 Project Structure
-
-* `AircraftController.cs`: Handles waypoint navigation, speed, and flight states.
-* `SelectionManager.cs`: Manages mouse interaction, highlighting, and UI updates.
-* `SimulationManager.cs`: Controls the master `Time.timeScale`.
-* `FreeCameraController.cs`: Handles the complex Free-Look and Smooth-Follow logic.
-* `AirportBoard.cs`: Generates the live terminal data list.
-
----
-
-📂 Movement Logic & State Machine
-The simulation uses a State-Driven Waypoint System to ensure realistic behavior:
-
-Waypoint Navigation: Aircraft move between Transform nodes using Vector3.MoveTowards. This prevents "teleporting" and ensures the plane follows the taxiway and flight paths accurately.
-
-Rotation: Turning is handled via Quaternion.Slerp directed at the next waypoint. A reverseUntilIndex is used to allow planes to push back from the gate realistically.
-
-State Transitions: The AircraftController monitors the currentWaypointIndex. Based on user-defined markers (e.g., takeoffStartIndex), the plane automatically switches its behavior:
-
-Taxiing: Fixed speed, landing gear down.
-
-Takeoff: Speed increases using Mathf.MoveTowards, and landing gear retracts once the altitude is above 5 units.
-
-Landing: Speed is moderated for approach, and landing gear is deployed.
-
-Parking: When reaching the gate (or a mid-path waypoint), the plane halts, and a parkTimer begins before the next loop.
+Acceleration/Deceleration: Speed is never constant; I used Mathf.MoveTowards for all velocity changes to simulate the weight and inertia of a real plane.
